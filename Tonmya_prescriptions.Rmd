@@ -1,0 +1,168 @@
+---
+title: "Tonmya Prescriptions"
+output: github_document
+date: "`r Sys.Date()`"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(gt)
+library(knitr)
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+library(lubridate)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Some simple models based on Tonmya sales
+
+What are we doing here? 
+- Just trying to get a grasp on the rate of increase and projecting out if that rate continues. It is not necessarily realistic to take it out as far as projections provide. Nothing here should be regarded as investment advice. I am not a financial analyst or advisor.
+
+```{r load sales data, echo=FALSE}
+sales <- c(2, 16,54,93,179,268,212,187,264,324,367, 352, 451, 598, 639, 642, 750)
+scripts <- c(2,12,35,60,126,154,127,108,163,193,219, 205, 285, 371, 384, 401, 462)
+new_scripts <-  c(2, 12, 35, 60, 126, 154, 122, 97, 140, 170, 201, 185, 249, 327, 341, 347, 365)
+start_date <- as.Date("2025-11-14")
+weekly_seq <- seq(start_date, by = "week", length.out = 52)
+```
+
+## Sales Projection - at weekly growth rate - *exponential model*
+
+```{r sales exponential 1, echo = FALSE, warning=FALSE}
+# 
+df_sales <- data.frame(sales, "wk" = 1:length(sales))
+mod_sales_exp <- nls(sales ~ a * (1 + r)^wk,
+           data = df_sales,
+           start = list(a = 17, r = 0))
+summary(mod_sales_exp)
+```
+The exponential model projects weekly increases of {r paste0(summary(mod_sales_exp)$coefficients[2] * 100, " %")}
+
+```{r sales exponential 2, echo = FALSE, warning=FALSE}
+df_exp <- data.frame("wk" = 1:52, 
+           "sales_reported" = c(df_sales$sales, rep(NA, 52 - length(df_sales$sales))),
+           "exponential_model" = round(summary(mod_sales_exp)$coefficients[1] *
+              (1 + summary(mod_sales_exp)$coefficients[2])^(1:52)),
+            "yearly_rate_predicted_M" = 52 / 1e3 * summary(mod_sales_exp)$coefficients[1] *
+              (1 + summary(mod_sales_exp)$coefficients[2])^(1:52))
+
+gt(df_exp[1:(length(sales) + 4), ])  |>
+  fmt_number(columns = 4, decimals = 1) |>
+  tab_header(
+    title = md("Exponential Model"))
+
+
+df_exp[1:(length(sales) + 4), 1:3] %>% 
+  pivot_longer(2:3) %>% 
+  ggplot(., aes(wk, value, colour = name)) + geom_point() + geom_line() +
+    ggtitle("Tonmya sales with exponential model")
+#clean up
+rm(df_exp)
+```
+## Sales Projection - at weekly rate - *linear model*
+
+```{r sales linear, echo = FALSE, warning=FALSE}
+mod_sales_lin <- lm(sales ~ wk, data = df_sales)
+
+summary(mod_sales_lin)
+
+df_lin <- data.frame("wk" = 1:52, 
+           "sales_reported" = c(df_sales$sales, rep(NA, 52 - length(df_sales$sales))),
+           "linear_model" = summary(mod_sales_lin)$coefficients[2] * 1:52,
+            "yearly_rate_predicted_M" = 52 / 1e3 * summary(mod_sales_lin)$coefficients[2] * 1:52)
+
+gt(df_lin[1:(length(sales) + 4), ]) |>
+  fmt_number(columns = c(3, 4), decimals = 1) |>
+  tab_header(title = md("Linear Model"))
+
+df_lin[1:(length(sales) + 4), 1:3] %>% 
+  pivot_longer(2:3) %>% 
+  ggplot(., aes(wk, value, colour = name)) + geom_point() + geom_line() +
+    ggtitle("Tonmya sales with linear model")
+
+#clean up
+rm(df_lin)
+```
+
+```{r combined plot, echo = FALSE, warning=FALSE}
+# df <- data.frame("wk" = 1:52,
+#                  "reported" = c(df_sales$sales, rep(NA, 52 - length(df_sales$sales))),
+# "linear" = summary(mod_sales_lin)$coefficients[2] * 1:52,
+# "exponential" = summary(mod_sales_exp)$coefficients[1] *
+#               (1 + summary(mod_sales_exp)$coefficients[2])^(1:52))
+# 
+# df %>% 
+#   pivot_longer(., 2:4) %>% 
+#   ggplot(., aes(wk, value)) +
+#   geom_point() +
+#   geom_line() +
+#   facet_grid(vars(name), scales = "free_y")
+#   
+# df %>% 
+#   select(-exponential) %>% 
+#   pivot_longer(., 2:3) %>% 
+#   ggplot(., aes(wk, value, colour = name)) +
+#   geom_point() +
+#   geom_line() +
+#   theme(legend.title = element_blank()) +
+#   ylab("$ weekly x1000")
+
+```
+
+
+## scripts Projection - at weekly growth rate - *exponential model*
+
+```{r scripts exponential 1, echo = FALSE, warning=FALSE}
+# 
+df_scripts <- data.frame(scripts, "wk" = 1:length(scripts))
+mod_scripts_exp <- nls(scripts ~ a * (1 + r)^wk,
+           data = df_scripts,
+           start = list(a = 17, r = 0))
+summary(mod_scripts_exp)
+```
+The exponential model projects weekly increases of {r paste0(summary(mod_scripts_exp)$coefficients[2] * 100, " %")}
+
+```{r scripts exponential 2, echo = FALSE, warning=FALSE}
+df_exp <- data.frame("wk" = 1:52, 
+           "scripts_reported" = c(df_scripts$scripts, rep(NA, 52 - length(df_scripts$scripts))),
+           "exponential_model" = round(summary(mod_scripts_exp)$coefficients[1] *
+              (1 + summary(mod_scripts_exp)$coefficients[2])^(1:52)),
+            "yearly_rate_predicted_M" = 52 / 1e3 * summary(mod_scripts_exp)$coefficients[1] *
+              (1 + summary(mod_scripts_exp)$coefficients[2])^(1:52))
+
+gt(df_exp[1:(length(scripts) + 4), ]) |>
+  fmt_number(columns = 4, decimals = 1) |>
+  tab_header(
+    title = md("Exponential Model"))
+
+
+df_exp[1:(length(scripts) + 4), 1:3] %>% 
+  pivot_longer(2:3) %>% 
+  ggplot(., aes(wk, value, colour = name)) + geom_point() + geom_line() +
+    ggtitle("Tonmya scripts with exponential model")
+
+```
+## scripts Projection - at weekly rate - *linear model*
+
+```{r scripts linear, echo = FALSE, warning=FALSE}
+mod_scripts_lin <- lm(scripts ~ wk, data = df_scripts)
+
+summary(mod_scripts_lin)
+
+df_lin <- data.frame("wk" = 1:52, 
+           "scripts_reported" = c(df_scripts$scripts, rep(NA, 52 - length(df_scripts$scripts))),
+           "linear_model" = summary(mod_scripts_lin)$coefficients[2] * 1:52,
+            "yearly_rate_predicted_M" = 52 / 1e3 * summary(mod_scripts_lin)$coefficients[2] * 1:52)
+
+gt(df_lin[1:(length(scripts) + 4), ]) |>
+  fmt_number(columns = c(3, 4), decimals = 1) |>
+  tab_header(title = md("Linear Model"))
+
+df_lin[1:(length(scripts) + 4), 1:3] %>% 
+  pivot_longer(2:3) %>% 
+  ggplot(., aes(wk, value, colour = name)) + geom_point() + geom_line() +
+    ggtitle("Tonmya scripts with linear model")
+```
