@@ -85,7 +85,7 @@ summary(mod_sales_lin)
 
 df_lin <- data.frame("wk" = 1:52, 
            "sales_reported" = c(df_sales$sales, rep(NA, 52 - length(df_sales$sales))),
-           "linear_model" = summary(mod_sales_lin)$coefficients[2] * 1:52,
+            "linear_model" = summary(mod_sales_lin)$coefficients[1] + summary(mod_sales_lin)$coefficients[2] * 1:52,
             "yearly_rate_predicted_M" = 52 / 1e3 * summary(mod_sales_lin)$coefficients[2] * 1:52)
 
 gt(df_lin[1:(length(sales) + 4), ]) |>
@@ -155,7 +155,7 @@ summary(mod_scripts_lin)
 
 df_lin <- data.frame("wk" = 1:52, 
            "scripts_reported" = c(df_scripts$scripts, rep(NA, 52 - length(df_scripts$scripts))),
-           "linear_model" = summary(mod_scripts_lin)$coefficients[2] * 1:52,
+           "linear_model" = summary(mod_scripts_lin)$coefficients[1] + summary(mod_scripts_lin)$coefficients[2] * 1:52,
             "yearly_rate_predicted_M" = 52 / 1e3 * summary(mod_scripts_lin)$coefficients[2] * 1:52)
 
 gt(df_lin[1:(length(scripts) + 4), ]) |>
