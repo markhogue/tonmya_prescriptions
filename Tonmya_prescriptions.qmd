@@ -26,9 +26,9 @@ What are we doing here?
 
 ```{r data}
 #| echo: false
-sales <- c(2, 16,54,93,179,268,212,187,264,324,367, 352, 451, 598, 639, 642, 750, 755)
-scripts <- c(2,12,35,60,126,154,127,108,163,193,219, 205, 285, 371, 384, 401, 462, 483)
-new_scripts <-  c(2, 12, 35, 60, 126, 154, 122, 97, 140, 170, 201, 185, 249, 327, 341, 347, 365, 384)
+sales <- c(2, 16,54,93,179,268,212,187,264,324,367, 352, 451, 598, 639, 642, 750, 755, 935)
+scripts <- c(2,12,35,60,126,154,127,108,163,193,219, 205, 285, 371, 384, 401, 462, 483, 572)
+new_scripts <-  c(2, 12, 35, 60, 126, 154, 122, 97, 140, 170, 201, 185, 249, 327, 341, 347, 365, 384, 465)
 start_date <- as.Date("2025-11-14")
 weekly_seq <- seq(start_date, by = "week", length.out = 52)
 ```
@@ -68,6 +68,13 @@ df_exp[1:(length(sales) + 4), 1:3] %>%
   ggplot(., aes(wk, value, colour = name)) + geom_point() + geom_line() +
   ylab("$, 000") +
     ggtitle("Tonmya sales with exponential model")
+
+df_exp[, 1:3] %>% 
+  pivot_longer(2:3) %>% 
+  ggplot(., aes(wk, value, colour = name)) + geom_point() + geom_line() +
+  ylab("$, 000") +
+    ggtitle("Tonmya sales with exponential model", subtitle = "long extrapolation")
+
 #clean up
 rm(df_exp)
 
