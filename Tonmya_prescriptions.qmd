@@ -230,3 +230,24 @@ df_lin[1:(length(scripts) + 4), 1:4] %>%
 rm(df_lin)
 ```
 
+## total / new scripts at weekly rate - *linear model*
+
+```{r scripts ratio linear model}
+#| echo: false
+#| warning: false
+
+trx_nrx_df <- data.frame("wk" = 1:length(scripts), "date" = weekly_seq[1:length(scripts)], "TRx" = scripts, "NRx" = new_scripts)
+trx_nrx_df$total_to_new = trx_nrx_df$TRx / trx_nrx_df$NRx
+
+mod_scripts_rat_lin <- lm(total_to_new ~ wk, data = trx_nrx_df)
+
+summary(mod_scripts_rat_lin)
+# plot(mod_scripts_lin)
+trx_nrx_df$lin <- predict(mod_scripts_rat_lin, wk = data.frame(1:length(scripts)))
+
+trx_nrx_df %>% 
+  pivot_longer(5:6) %>% 
+  ggplot(., aes(wk, value, colour = name)) + geom_point() + geom_line() +
+  ylab("TRx/NRx") +
+    ggtitle("Tonmya total / new prescriptions linear model")
+```
