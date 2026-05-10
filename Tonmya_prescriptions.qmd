@@ -157,15 +157,15 @@ df_exp <- data.frame("wk" = 1:52, weekly_seq,
            "scripts_reported" = c(df_scripts$scripts, rep(NA, 52 - length(df_scripts$scripts))),
            "exponential_model" = round(summary(mod_scripts_exp)$coefficients[1] *
               (1 + summary(mod_scripts_exp)$coefficients[2])^(1:52)),
-            "yearly_rate_predicted_M" = 52 / 1e3 * summary(mod_scripts_exp)$coefficients[1] *
+            "yearly_rate_predicted_M" = 52 * summary(mod_scripts_exp)$coefficients[1] *
               (1 + summary(mod_scripts_exp)$coefficients[2])^(1:52))
 
 gt(df_exp[1:(length(scripts) + 4), ]) |>
   fmt_date(column = 2) |>
-  fmt_number(columns = 5, decimals = 1) |>
-  cols_label(scripts_reported = "total reported, thousands") |>
-  cols_label(exponential_model = "exp predicted, thousands") |>
-  cols_label(yearly_rate_predicted_M = "annual, M") |>
+  fmt_number(columns = 5, decimals = 0) |>
+  cols_label(scripts_reported = "total reported") |>
+  cols_label(exponential_model = "exp predicted") |>
+  cols_label(yearly_rate_predicted_M = "annual") |>
   tab_header(
     title = md("Scripts, Exponential Model"))
 
@@ -210,15 +210,15 @@ summary(mod_scripts_lin)
 df_lin <- data.frame("wk" = 1:52, weekly_seq, 
            "scripts_reported" = c(df_scripts$scripts, rep(NA, 52 - length(df_scripts$scripts))),
            "linear_model" = summary(mod_scripts_lin)$coefficients[1] + summary(mod_scripts_lin)$coefficients[2] * 1:52,
-            "yearly_rate_predicted_M" = 52 / 1e3 * summary(mod_scripts_lin)$coefficients[2] * 1:52)
+            "yearly_rate_predicted_M" = 52 * summary(mod_scripts_lin)$coefficients[2] * 1:52)
 
 gt(df_lin[1:(length(scripts) + 4), ]) |>
   fmt_date(column = 2) |>
   fmt_number(columns = 4, decimals = 1) |>
-  fmt_number(columns = 5, decimals = 1) |>
-  cols_label(scripts_reported = "total reported, thousands") |>
-  cols_label(linear_model = "linear predicted, thousands") |>
-  cols_label(yearly_rate_predicted_M = "annual, M") |>
+  fmt_number(columns = 5, decimals = 0) |>
+  cols_label(scripts_reported = "total reported") |>
+  cols_label(linear_model = "linear predicted") |>
+  cols_label(yearly_rate_predicted_M = "annual") |>
   tab_header(title = md("Scripts, Linear Model"))
 
 df_lin[1:(length(scripts) + 4), 1:4] %>% 
