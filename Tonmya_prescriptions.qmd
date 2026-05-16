@@ -66,7 +66,7 @@ df_lin[1:(length(scripts) + 4), 1:4] %>%
   ggplot(., aes(wk, value, colour = name)) + 
   geom_point() + 
   geom_line() +  
-  theme_calc() +   
+  theme_calc() +
   scale_color_calc() +
   ylab("total scripts") +
     ggtitle("Tonmya scripts with linear model", subtitle = "raw Symphony data")
@@ -131,7 +131,7 @@ df_exp[1:(length(sales)), c(1, 3, 6)] %>%
   theme_calc() +   
   scale_color_calc() +
   ylab("TRx") +
-    ggtitle("Tonmya sales with exponential model",
+  ggtitle("Tonmya sales with exponential model",
             subtitle = "broken into week cohorts 1 through 4, raw Symphony data") +
   facet_grid(vars(wk_cohort))
 #clean up
@@ -197,7 +197,11 @@ gt(df_exp[1:(length(sales) + 4), ])  |>
 
 df_exp[1:(length(sales) + 4), 1:4] %>% 
   pivot_longer(3:4) %>% 
-  ggplot(., aes(wk, value, colour = name)) + geom_point() + geom_line() +
+  ggplot(., aes(wk, value, colour = name)) + 
+  geom_point() + 
+  geom_line() +
+  theme_calc() +   
+  scale_color_calc() +
   ylab("$, thousands") +
     ggtitle("Tonmya sales with exponential model", subtitle = "raw Symphony data")
 
