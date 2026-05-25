@@ -288,3 +288,32 @@ rm(df_lin)
 
 ```
 
+## Refills - at weekly rate - *linear model*
+
+```{r refills linear model}
+#| echo: false
+#| warning: false
+
+trx_nrx_df <- trx_nrx_df %>% mutate(refills = TRx - NRx)
+
+mod_refills_lin <- lm(refills ~ wk, data = trx_nrx_df)
+
+summary(mod_refills_lin)
+# plot(mod_scripts_lin)
+
+df_lin_refills <- data.frame("wk" = 1:52, weekly_seq, 
+           "refills" = c(trx_nrx_df$refills, rep(NA, 52 - length(df_scripts$scripts))),
+           "linear_model" = summary(mod_refills_lin)$coefficients[1] + summary(mod_refills_lin)$coefficients[2] * 1:52,
+            "yearly_rate_predicted_M" = 52 * summary(mod_refills_lin)$coefficients[2] * 1:52)
+
+df_lin_refills[1:(length(scripts) + 4), 1:4] %>% 
+  pivot_longer(3:4) %>% 
+  ggplot(., aes(wk, value, colour = name)) + 
+  geom_point() + 
+  geom_line() +  
+  theme_calc() +
+  scale_color_calc() +
+  ylab("refills") +
+    ggtitle("Tonmya refills with linear model", subtitle = "raw Symphony data")
+
+```
