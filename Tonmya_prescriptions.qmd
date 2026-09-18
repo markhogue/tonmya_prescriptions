@@ -1,6 +1,10 @@
 ---
 title: "Tonmya_Prescriptions"
-format: pdf
+format: 
+  pdf:
+   include-in-header:
+   - text: \thispagestyle{empty}
+   pagestyle: empty
 editor: source
 date: "`r Sys.Date()`"
 editor_options: 
